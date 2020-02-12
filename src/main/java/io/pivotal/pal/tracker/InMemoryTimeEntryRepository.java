@@ -1,0 +1,58 @@
+package io.pivotal.pal.tracker;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Repository;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+
+@Repository
+public class InMemoryTimeEntryRepository implements TimeEntryRepository {
+
+    private HashMap<Long, TimeEntry> timeEntries = new HashMap<>();
+    long currentId=1;
+    @Override
+    public TimeEntry create(TimeEntry timeEntry){
+       long id = currentId++;
+       TimeEntry timeEntry1=new TimeEntry(
+               id,
+       timeEntry.getProjectId(),
+       timeEntry.getUserId(),
+       timeEntry.getDate(),
+       timeEntry.getHours()
+       );
+
+       timeEntries.put(id,timeEntry1);
+       return timeEntry1;
+    }
+    @Override
+    public TimeEntry find(long id){
+        return timeEntries.get(id);
+    }
+    @Override
+    public List<TimeEntry> list(){
+        return new ArrayList<>(timeEntries.values());
+    }
+    @Override
+    public TimeEntry update(long id, TimeEntry timeEntry){
+        if (find(id) == null) return null;
+
+        TimeEntry updatedEntry = new TimeEntry(
+                id,
+                timeEntry.getProjectId(),
+                timeEntry.getUserId(),
+                timeEntry.getDate(),
+                timeEntry.getHours()
+        );
+
+        timeEntries.replace(id, updatedEntry);
+        return updatedEntry;
+    }
+
+
+    @Override
+    public void delete(long id) {
+        timeEntries.remove(id);
+    }
+}
